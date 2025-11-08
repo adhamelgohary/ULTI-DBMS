@@ -53,6 +53,29 @@ class DatabaseManager:
             self.connection.close()
             print("Database connection closed.")
 
+    def list_databases(self):
+        """
+        Retrieves a list of all databases from the server.
+
+        Returns:
+            list: A list of database names, or an empty list on error.
+        """
+        if not (self.connection and self.connection.is_connected()):
+            print("Not connected to a database.")
+            return []
+
+        try:
+            self.cursor.execute("SHOW DATABASES;")
+            # Filter out standard system databases to keep the list clean
+            system_dbs = ["information_schema", "mysql", "performance_schema", "sys"]
+            databases = [
+                db[0] for db in self.cursor.fetchall() if db[0] not in system_dbs
+            ]
+            return databases
+        except mysql.connector.Error as err:
+            print(f"Failed to list databases: {err}")
+            return []
+
     def list_tables(self):
         """
         Retrieves a list of tables from the connected database.
