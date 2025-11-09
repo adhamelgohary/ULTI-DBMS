@@ -57,22 +57,29 @@ class WelcomeWindow(QDialog):
     def _on_create_connection(self):
         """Opens and manages the connection dialog."""
         dialog = ConnectionDialog(self)
-        # Connect the dialog's custom signal to our test logic
         dialog.test_connection_requested.connect(self._on_test_connection)
 
-        # If user clicks "Continue" (after a successful test)
+        # We reset the state each time we open the dialog
+        self.successful_adapter = None
+        self.connection_details = None
+
         if dialog.exec():
-            # The adapter and details should have been set by the successful test
+            # If the user clicked "Continue", the test must have succeeded.
+            # self.successful_adapter and self.connection_details are now set.
             if self.successful_adapter:
                 databases = self.successful_adapter.list_databases()
                 self._populate_database_list(databases)
+            else:
+                # This case shouldn't happen if the logic is correct, but it's good practice
+                QMessageBox.critical(self, "Error", "Connection was not established.")
 
     def _on_test_connection(self, details):
         """Slot that receives the test request from the ConnectionDialog."""
-        # This is a bit tricky: the signal is on a different thread, so we need the sender()
+        print(f"[DEBUG] Test requested with details: {details}")
+        # The sender() is the dialog that emitted the signal
         dialog = self.sender()
 
-        db_type = details.pop("db_type").split(" ")[0]
+        db_type = details.get("db_type", "").split(" ")[0]
         adapter_class = DB_ADAPTERS.get(db_type)
         if not adapter_class:
             QMessageBox.critical(
@@ -81,22 +88,29 @@ class WelcomeWindow(QDialog):
             return
 
         try:
-            # Create a temporary adapter just for the test
             adapter = adapter_class()
-            if adapter.connect(details):
+            # We need to remove db_type before passing details to the adapter's connect method
+            connect_details = details.copy()
+            connect_details.pop("db_type", None)
+
+            if adapter.connect(connect_details):
                 QMessageBox.information(dialog, "Success", "Connection successful!")
-                # On success, enable the continue button and store the adapter
+                # On success, enable the continue button and store the state
                 dialog.on_test_success()
                 self.successful_adapter = adapter
-                self.connection_details = details  # Save details for MainWindow
+                self.connection_details = (
+                    details  # Store the full details, including db_type
+                )
             else:
                 QMessageBox.critical(
-                    dialog, "Failed", "Connection failed. Check details."
+                    dialog, "Failed", "Connection failed. Please check credentials."
                 )
                 self.successful_adapter = None
-        except ConnectionError as e:
-            QMessageBox.critical(dialog, "Driver Error", str(e))
+                self.connection_details = None
+        except Exception as e:
+            QMessageBox.critical(dialog, "Error", f"An unexpected error occurred: {e}")
             self.successful_adapter = None
+            self.connection_details = None
 
     def _populate_database_list(self, databases):
         """Shows and populates the list of databases in the right column."""
@@ -107,9 +121,21 @@ class WelcomeWindow(QDialog):
 
     def _on_database_selected(self, item):
         """When a database is chosen, finalize and close the welcome window."""
+        print("[DEBUG] Database double-clicked:", item.text())
+
+        # THE FIX: We check that the connection details exist before proceeding.
+        if not self.connection_details:
+            print("[DEBUG] ERROR: Cannot proceed, connection_details is not set.")
+            return
+
         self.selected_database = item.text()
+        # We now safely add the selected database to our stored details
         self.connection_details["database"] = self.selected_database
-        # Accept the dialog, signaling to main.py that we're ready
+
+        print("[DEBUG] Final connection details:", self.connection_details)
+        print("[DEBUG] Closing WelcomeWindow with 'Accepted' result.")
+
+        # This signals to main.py that we're ready to launch the MainWindow
         self.accept()
 
     # --- UI Builder and Styling Methods (unchanged) ---

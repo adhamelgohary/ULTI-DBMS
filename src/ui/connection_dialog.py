@@ -13,7 +13,6 @@ from PyQt6.QtCore import pyqtSignal
 
 
 class ConnectionDialog(QDialog):
-    # Signal to request a connection test. It carries the details dict.
     test_connection_requested = pyqtSignal(dict)
 
     def __init__(self, parent=None):
@@ -30,13 +29,16 @@ class ConnectionDialog(QDialog):
 
         # --- Create Buttons ---
         self.button_box = QDialogButtonBox()
+
+        # CORRECTED: Use the full, correct PyQt6 enum names
         self.test_button = self.button_box.addButton(
-            "Test Connection", QDialogButtonBox.ActionRole
+            "Test Connection", QDialogButtonBox.ButtonRole.ActionRole
         )
         self.continue_button = self.button_box.addButton(
-            "Continue", QDialogButtonBox.AcceptRole
+            "Continue", QDialogButtonBox.ButtonRole.AcceptRole
         )
-        self.continue_button.setEnabled(False)  # Disabled by default
+
+        self.continue_button.setEnabled(False)
         self.cancel_button = self.button_box.addButton(
             QDialogButtonBox.StandardButton.Cancel
         )
@@ -60,7 +62,7 @@ class ConnectionDialog(QDialog):
 
     def _on_test_clicked(self):
         """Gathers details and emits the test signal."""
-        self.continue_button.setEnabled(False)  # Always reset on new test
+        self.continue_button.setEnabled(False)
         details = self.get_connection_details()
         self.test_connection_requested.emit(details)
 
@@ -70,7 +72,6 @@ class ConnectionDialog(QDialog):
 
     def get_connection_details(self):
         """Public method to retrieve the entered text."""
-        # Note: We no longer include a database name here
         return {
             "db_type": self.db_type_combo.currentText(),
             "host": self.host_input.text(),
