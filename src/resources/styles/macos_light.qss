@@ -2,103 +2,20 @@
 
 /* General Window and Font Styling */
 QMainWindow, QDialog {
-    background-color: #ECECEC; /* The standard macOS window chrome color */
-    font-family: '.SF NS Text', 'Helvetica Neue', 'Arial'; /* Use system font */
+    background-color: #ECECEC;
+    font-family: '.SF NS Text', 'Helvetica Neue', 'Arial';
 }
 
 QWidget {
-    color: #333; /* Dark grey text for readability */
+    color: #333;
 }
 
-/* --- Column 1: Connection Switcher --- */
-QListWidget#ConnectionList {
-    background-color: #E8E8E8;
-    border: none;
-    border-right: 1px solid #D0D0D0; /* Separator line */
-}
-QListWidget#ConnectionList::item {
-    padding: 8px;
-    color: #555;
-    border-radius: 4px;
-}
-QListWidget#ConnectionList::item:selected {
-    background-color: #D0D0D0; /* A darker grey for selection */
-    color: #000;
-}
-
-/* --- Column 2: Object Explorer --- */
-QWidget#ObjectExplorer {
-    background-color: #F5F5F5; /* A very light grey content background */
-    border: none;
-}
-
-/* --- Column 2: Segmented Buttons (Tables, Queries, History) --- */
-/* We target them by giving them an object name in the Python code */
-QPushButton#SegmentedButton {
-    padding: 5px 12px;
-    border: 1px solid #BDBDBD;
-    background-color: #FDFDFD;
-}
-QPushButton#SegmentedButton:hover {
-    background-color: #F0F0F0;
-}
-QPushButton#SegmentedButton:checked {
-    background-color: #FFFFFF;
-    font-weight: bold;
-}
-/* This is a trick to make them look like one component */
-QPushButton#SegmentedButton[pos="left"] {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-QPushButton#SegmentedButton[pos="right"] {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-left: none; /* Remove left border to merge */
-}
-QPushButton#SegmentedButton[pos="mid"] {
-    border-left: none; /* Remove left border to merge */
-}
-
-
-/* --- Column 2: Tree Widget --- */
-QTreeWidget {
-    border: none;
-    background-color: transparent; /* Inherit from parent */
-    font-size: 13px;
-}
-QTreeWidget::item {
-    padding: 4px 0px; /* Add some vertical spacing */
-}
-QTreeWidget::item:hover {
-    background-color: #EAEAEA;
-    border-radius: 4px;
-}
-QTreeWidget::item:selected {
-    background-color: #007AFF; /* Standard macOS selection blue */
-    color: white;
-}
-/* Style the expand/collapse arrow */
-QTreeView::branch {
-    background: transparent;
-}
-QTreeView::branch:has-children:!has-siblings:closed,
-QTreeView::branch:closed:has-children:has-siblings {
-        border-image: none;
-        image: url(src/resources/icons/chevron-right.svg);
-}
-QTreeView::branch:open:has-children:!has-siblings,
-QTreeView::branch:open:has-children:has-siblings  {
-        border-image: none;
-        image: url(src/resources/icons/chevron-down.svg);
-}
-
-
-/* --- Top Toolbar Styling --- */
+/* --- Top Toolbar Styling (MODIFIED) --- */
 QToolBar {
     background-color: #ECECEC;
     border-bottom: 1px solid #D0D0D0;
-    padding: 1px;
+    padding: 3px; /* Add a little more vertical padding */
+    spacing: 8px; /* Spacing between items like the label and buttons */
 }
 QToolBar QPushButton {
     background-color: transparent;
@@ -113,29 +30,66 @@ QToolBar QPushButton:pressed {
     background-color: #C5C5C5;
 }
 
-
-/* --- General UI Elements --- */
-QSplitter::handle {
-    background-color: #D0D0D0;
-}
-QSplitter::handle:horizontal {
-    width: 1px;
-}
-
-QLineEdit {
-    padding: 5px;
-    border: 1px solid #D0D0D0;
-    border-radius: 5px;
-    background-color: white;
+/* --- Connection Label in Toolbar (MODIFIED) --- */
+/* This is the key to the new look */
+QLabel#ConnectionLabel {
+    background-color: #D0E3FF; /* Light blue background */
+    color: #2C528B; /* Dark blue text */
+    padding: 5px 12px 5px 12px;
+    border-radius: 6px;
+    font-weight: 500; /* Slightly bolder than normal */
+    font-size: 13px;
 }
 
-QTableWidget {
-    border: 1px solid #D0D0D0;
-    gridline-color: #E0E0E0;
-}
-QHeaderView::section {
+/* --- Sidebar (Unchanged) --- */
+QWidget#ObjectExplorer {
     background-color: #F5F5F5;
-    padding: 4px;
-    border: 1px solid #D0D0D0;
+    border-right: 1px solid #D0D0D0;
+}
+
+/* --- Segmented Buttons (Unchanged) --- */
+QPushButton#SegmentedButton {
+    padding: 5px 12px;
+    border: 1px solid #BDBDBD;
+    background-color: #FDFDFD;
+}
+QPushButton#SegmentedButton:hover {
+    background-color: #F0F0F0;
+}
+QPushButton#SegmentedButton:checked {
+    background-color: #FFFFFF;
     font-weight: bold;
 }
+QPushButton#SegmentedButton[pos="left"] {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+QPushButton#SegmentedButton[pos="right"] {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-left: none;
+}
+QPushButton#SegmentedButton[pos="mid"] {
+    border-left: none;
+}
+
+
+/* --- Tree Widget (Unchanged) --- */
+QTreeWidget {
+    border: none;
+    background-color: transparent;
+    font-size: 13px;
+}
+QTreeWidget::item { padding: 4px 0px; }
+QTreeWidget::item:hover { background-color: #EAEAEA; border-radius: 4px; }
+QTreeWidget::item:selected { background-color: #007AFF; color: white; }
+QTreeView::branch { background: transparent; }
+QTreeView::branch:has-children:!has-siblings:closed, QTreeView::branch:closed:has-children:has-siblings { image: url(src/resources/icons/chevron-right.svg); }
+QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-children:has-siblings  { image: url(src/resources/icons/chevron-down.svg); }
+
+/* --- General UI Elements (Unchanged) --- */
+QSplitter::handle { background-color: #D0D0D0; }
+QSplitter::handle:horizontal { width: 1px; }
+QLineEdit { padding: 5px; border: 1px solid #D0D0D0; border-radius: 5px; background-color: white; }
+QTableWidget { border: 1px solid #D0D0D0; gridline-color: #E0E0E0; }
+QHeaderView::section { background-color: #F5F5F5; padding: 4px; border: 1px solid #D0D0D0; font-weight: bold; }

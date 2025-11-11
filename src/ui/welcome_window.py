@@ -145,7 +145,7 @@ class WelcomeWindow(QDialog):
         layout = QVBoxLayout(container)
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(15)
-        app_name_label = QLabel("SQL Client")
+        app_name_label = QLabel("ULTI DMBS")
         app_name_label.setObjectName("AppNameLabel")
         version_label = QLabel("Version: 0.1.0")
         version_label.setObjectName("VersionLabel")
